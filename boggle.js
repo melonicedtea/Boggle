@@ -19,7 +19,7 @@ let dice = [
 
 let board = "";
 
-$.each(dice, function (i, die) {
+$(dice).each( function (i, die) {
   board += die[Math.floor(Math.random() * 5)];
 });
 
@@ -30,20 +30,102 @@ let field = [
   [board[12], board[13], board[14], board[15]],
 ];
 
-let table_body = '<table border="1">';
+let table_body = '<table id="board" border="1">';
 
 for (let i = 0; i < field.length; i++) {
-  table_body += "<tr>";
+  table_body += '<tr>';
 
   for (let j = 0; j < field.length; j++) {
-    table_body += "<td>";
+    table_body += '<td class="cell">' ;
     table_body += field[i][j];
-    table_body += "</td>";
+    table_body += '</td>';
   }
-  table_body += "</tr>";
+  table_body += '</tr>';
 }
-table_body += "</table>";
+table_body += '</table>';
 
+// button
+let button = '<input id="button-submit" type="button" value="submit"/>';
+
+let string = "";
+
+function submit() {   
+  string = '<div>' + string + '</div>' 
+  $("body").append(string);
+}
+
+function addToString(e) {
+  string += e;
+}
+
+function removeFromString(e) {
+  string = string.replace(e, '');
+}
+
+function select(e){
+  if ($(e).css("background-color") == "rgb(255, 0, 0)") {
+    $(e).css({
+      "background-color": "transparent",
+
+    });
+    removeFromString($(e).text());
+  } else {
+    $(e).css({
+      "background-color": "red",
+
+    });
+    addToString($(e).text());
+  }
+}
+
+// onready
 $(document).ready(function () {
-  $("#tableDiv").html(table_body);
+  // append html
+  $("body").append(table_body);
+  $("body").append(button);
+
+  //document css
+  $("html").css({
+    "font-family": "'Lucida Console', Courier, monospace",
+
+   
+
+  });
+
+  // board/table css
+  $("#board").css({
+    "-webkit-touch-callout": "none",
+    "-webkit-user-select": "none",
+    "-khtml-user-select": "none",
+    "-moz-user-select": "none",
+    "-ms-user-select": "none",
+    "user-select": "none",
+
+    "margin-left": "auto",
+    "margin-right": "auto",
+
+    "table-layout": "fixed",
+    "height" : "320px",
+    "width" : "320px",
+
+    "text-align": "center",
+  });
+
+  // cell css
+  $("#board .cell").css({
+    "cursor":"pointer",
+  
+  });
+
+  // cell click
+  $("#board .cell").click(function (e) {
+    select(this);
+    e.preventDefault();
+  });
+  // button submit click
+  $("#button-submit").click(function (e) { 
+    submit();
+    e.preventDefault();
+    
+  });
 });
