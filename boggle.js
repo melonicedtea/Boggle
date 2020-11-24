@@ -45,13 +45,22 @@ for (let i = 0; i < field.length; i++) {
 table_body += '</table>';
 
 // button
-let button = '<input id="button-submit" type="button" value="submit"/>';
+let button = 
+'<input id="button-submit" type="button" value="submit"/>';
 
 let string = "";
 
+function clear() {
+  string ="";
+  $(".cell").css({
+    "background-color": "transparent",
+
+  });
+}
+
 function submit() {   
-  string = '<div>' + string + '</div>' 
-  $("body").append(string);
+  $("body").append('<div>' + string + '</div>');
+  clear();
 }
 
 function addToString(e) {
@@ -78,8 +87,11 @@ function select(e){
   }
 }
 
+
+
 // onready
 $(document).ready(function () {
+
   // append html
   $("body").append(table_body);
   $("body").append(button);
@@ -87,8 +99,6 @@ $(document).ready(function () {
   //document css
   $("html").css({
     "font-family": "'Lucida Console', Courier, monospace",
-
-   
 
   });
 
@@ -122,6 +132,7 @@ $(document).ready(function () {
     select(this);
     e.preventDefault();
   });
+
   // button submit click
   $("#button-submit").click(function (e) { 
     submit();
