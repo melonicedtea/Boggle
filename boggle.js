@@ -17,10 +17,20 @@ let dice = [
   ["P", "A", "C", "E", "M", "D"],
 ];
 
-let board = "";
+class Cell {
+  constructor(letter, id) {
+    this.letter = letter;
+    this.id = id;   
+    this.selected = false; 
+  }
+}
+
+let board = [];
 
 $(dice).each( function (i, die) {
-  board += die[Math.floor(Math.random() * 5)];
+  letter = die[Math.floor(Math.random() * dice[i].length)];
+  let c = new Cell(letter, i);
+  board.push(c);
 });
 
 let field = [
@@ -37,7 +47,7 @@ for (let i = 0; i < field.length; i++) {
 
   for (let j = 0; j < field.length; j++) {
     table_body += '<td class="cell">' ;
-    table_body += field[i][j];
+    table_body += field[i][j].letter;
     table_body += '</td>';
   }
   table_body += '</tr>';
@@ -48,6 +58,7 @@ table_body += '</table>';
 let button = 
 '<input id="button-submit" type="button" value="submit"/>';
 
+// selected
 let string = "";
 
 function clear() {
@@ -71,19 +82,34 @@ function removeFromString(e) {
   string = string.replace(e, '');
 }
 
+function getLetterFromIndex(e){
+  let cellIndex = e.cellIndex;
+  let rowLength = field[e.parentNode.rowIndex].length;
+  let rowIndex = e.parentNode.rowIndex;
+
+  let index = cellIndex + rowIndex * rowLength;
+
+  let letter = board[index].letter;
+
+  return letter;
+}
+
 function select(e){
+  let letter = getLetterFromIndex(e);
+
   if ($(e).css("background-color") == "rgb(255, 0, 0)") {
     $(e).css({
       "background-color": "transparent",
 
     });
-    removeFromString($(e).text());
+    removeFromString(letter);
   } else {
     $(e).css({
       "background-color": "red",
 
     });
-    addToString($(e).text());
+
+    addToString(letter);
   }
 }
 
