@@ -21,7 +21,8 @@ class Cell {
   constructor(letter, id) {
     this.letter = letter;
     this.id = id;   
-    this.selected = false; 
+    this.unselected = true; 
+    this.enabled = true;
   }
 }
 
@@ -47,7 +48,7 @@ for (let i = 0; i < field.length; i++) {
 
   for (let j = 0; j < field.length; j++) {
     table_body += '<td class="cell">' ;
-    table_body += field[i][j].letter;
+    table_body += field[i][j].id;
     table_body += '</td>';
   }
   table_body += '</tr>';
@@ -63,9 +64,14 @@ let string = "";
 
 function clear() {
   string ="";
+
   $(".cell").css({
     "background-color": "transparent",
+  });
 
+  $(board).each( function (i, e) { 
+     e.unselected = true;
+     e.enabled = true;
   });
 }
 
@@ -94,26 +100,42 @@ function getLetterFromIndex(e){
   return letter;
 }
 
-function select(e){
-  let letter = getLetterFromIndex(e);
+function getCellFromIndex(e){
+  let cellIndex = e.cellIndex;
+  let rowLength = field[e.parentNode.rowIndex].length;
+  let rowIndex = e.parentNode.rowIndex;
 
-  if ($(e).css("background-color") == "rgb(255, 0, 0)") {
-    $(e).css({
-      "background-color": "transparent",
+  let index = cellIndex + rowIndex * rowLength;
 
-    });
-    removeFromString(letter);
-  } else {
-    $(e).css({
-      "background-color": "red",
+  let cell = board[index];
 
-    });
-
-    addToString(letter);
-  }
+  return cell;
 }
 
+function select(e) {
+  let letter = getLetterFromIndex(e);
+  let cell = getCellFromIndex(e);
 
+  if (cell.enabled) {
+    if (cell.unselected) {
+      $(e).css({
+        "background-color": "red",
+      });
+
+      addToString(letter);
+
+      cell.unselected = false;
+    } else {
+      $(e).css({
+        "background-color": "transparent",
+      });
+      
+      removeFromString(letter);
+
+      cell.unselected = true;
+    }
+  }
+}
 
 // onready
 $(document).ready(function () {
