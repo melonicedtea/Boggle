@@ -17,23 +17,27 @@ let dice = [
   ["P", "A", "C", "E", "M", "D"],
 ];
 
+// Cell class
 class Cell {
   constructor(letter, id) {
     this.letter = letter;
     this.id = id;   
     this.unselected = true; 
-    this.enabled = true;
+    this.enabled = false;
   }
 }
 
+// board array
 let board = [];
 
+// fill board with cells containing random letters
 $(dice).each( function (i, die) {
   letter = die[Math.floor(Math.random() * dice[i].length)];
   let c = new Cell(letter, i);
   board.push(c);
 });
 
+// field array
 let field = [
   [board[0], board[1], board[2], board[3]],
   [board[4], board[5], board[6], board[7]],
@@ -41,6 +45,7 @@ let field = [
   [board[12], board[13], board[14], board[15]],
 ];
 
+// table HTML
 let table_body = '<table id="board" border="1">';
 
 for (let i = 0; i < field.length; i++) {
@@ -48,16 +53,27 @@ for (let i = 0; i < field.length; i++) {
 
   for (let j = 0; j < field.length; j++) {
     table_body += '<td class="cell">' ;
-    table_body += field[i][j].letter;
+    //table_body += field[i][j].letter;
     table_body += '</td>';
   }
   table_body += '</tr>';
 }
 table_body += '</table>';
 
-// selected
+// fills table
+function fillTable(){
+  let cnt = 0;
+  for (let i = 0; i < field.length; i++) {
+    for (let j = 0; j < field.length; j++) {
+      $("#board .cell").eq(cnt++).html(field[i][j].letter);
+    }
+  }
+}
+
+// selected string
 let string = "";
 
+// clear string and unselect cells
 function clear() {
   string ="";
 
@@ -67,23 +83,33 @@ function clear() {
 
   $(board).each( function (i, e) { 
      e.unselected = true;
-     e.enabled = true;
+     //e.enabled = true;
   });
 }
 
+// wordlist array
+let wordList = [];
+
+// add string to 
 function submit() {   
-  $("body").append('<div>' + string + '</div>');
+  if(string.length >= 3 && $.inArray(string, wordList) == -1){
+    wordList.push(string);
+    $("body").append('<div>' + string + '</div>');
+  }
   clear();
 }
 
+// adds e to string
 function addToString(e) {
   string += e;
 }
 
+// replace e in string with empty char
 function removeFromString(e) {
   string = string.replace(e, '');
 }
 
+// returns letter from index from selected table cell
 function getLetterFromIndex(e){
   let cellIndex = e.cellIndex;
   let rowLength = field[e.parentNode.rowIndex].length;
@@ -96,6 +122,7 @@ function getLetterFromIndex(e){
   return letter;
 }
 
+// returns cell from index from selected table cell
 function getCellFromIndex(e){
   let cellIndex = e.cellIndex;
   let rowLength = field[e.parentNode.rowIndex].length;
@@ -108,6 +135,7 @@ function getCellFromIndex(e){
   return cell;
 }
 
+// set unselected to true and change color of cells
 function select(e) {
   let letter = getLetterFromIndex(e);
   let cell = getCellFromIndex(e);
@@ -133,7 +161,19 @@ function select(e) {
   }
 }
 
+//enable cells
+function enableCells(){
+  $(board).each(function (i, cell) { 
+     cell.enabled = true;
+  });
+}
 
+//disable cells
+function disableCells(){
+  $(board).each(function (i, cell) { 
+     cell.enabled = false;
+  });
+}
 
 // button_submit
 let button_submit = 
@@ -143,27 +183,39 @@ let button_submit =
 let button_start = 
 '<input id="button-start" type="button" value="start"/>';
 
-//timer
+// timer: once in a while, if start == true then countdown 
+//  when duration reaches < 1, sets duration = 1, calls function
 let duration = 180;
 let start = false;
-let timer = '<div id="timer">' + duration + ' Seconds</div>';
+let timer_HTML = '<div id="timer">' + duration + ' Seconds</div>';
 let interval = setInterval(function() {
 
   if(start){
   $('#timer').text((duration -= 1)
    + " Seconds");
 
-   if(duration <= 1) {
+   if(duration < 1) {
     //clearInterval(interval);
+    disableCells();
     duration = 1;
    }
   }
 
 }, 1000);
 
+// starts timer
 function timerStart() {
-  duration = 180;
   start = true;
+}
+
+// score
+let score = 0;
+let score_HTML = "<div id='score'>" + score + " Points </div>";
+
+// updates score
+function updateScore(){
+  score = wordList.length;
+  $("#score").text(score + " Points");
 }
 
 // onready
@@ -173,10 +225,11 @@ $(document).ready(function () {
   $("body").append(table_body);
   $("body").append(button_submit);
   $("body").append(button_start);
-  $("body").append(timer);
+  $("body").append(timer_HTML);
+  $("body").append(score_HTML);
 
 
-  //document css
+  // document css
   $("html").css({
     "font-family": "'Lucida Console', Courier, monospace",
 
@@ -217,6 +270,7 @@ $(document).ready(function () {
   // button submit click
   $("#button-submit").click(function (e) { 
     submit();
+    updateScore();
     e.preventDefault();
     
   });
@@ -224,7 +278,8 @@ $(document).ready(function () {
   // button start click
   $("#button-start").click(function (e) { 
     timerStart();
-    e.preventDefault();
-    
+    enableCells();
+    fillTable();
+    e.preventDefault(); 
   });
 });
