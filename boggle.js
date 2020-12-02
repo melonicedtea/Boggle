@@ -48,16 +48,12 @@ for (let i = 0; i < field.length; i++) {
 
   for (let j = 0; j < field.length; j++) {
     table_body += '<td class="cell">' ;
-    table_body += field[i][j].id;
+    table_body += field[i][j].letter;
     table_body += '</td>';
   }
   table_body += '</tr>';
 }
 table_body += '</table>';
-
-// button
-let button = 
-'<input id="button-submit" type="button" value="submit"/>';
 
 // selected
 let string = "";
@@ -137,12 +133,48 @@ function select(e) {
   }
 }
 
+
+
+// button_submit
+let button_submit = 
+'<input id="button-submit" type="button" value="submit"/>';
+
+// button_start
+let button_start = 
+'<input id="button-start" type="button" value="start"/>';
+
+//timer
+let duration = 180;
+let start = false;
+let timer = '<div id="timer">' + duration + ' Seconds</div>';
+let interval = setInterval(function() {
+
+  if(start){
+  $('#timer').text((duration -= 1)
+   + " Seconds");
+
+   if(duration <= 1) {
+    //clearInterval(interval);
+    duration = 1;
+   }
+  }
+
+}, 1000);
+
+function timerStart() {
+  duration = 180;
+  start = true;
+}
+
 // onready
 $(document).ready(function () {
 
   // append html
   $("body").append(table_body);
-  $("body").append(button);
+  $("body").append(button_submit);
+  $("body").append(button_start);
+  $("body").append(timer);
+
 
   //document css
   $("html").css({
@@ -167,6 +199,7 @@ $(document).ready(function () {
     "width" : "320px",
 
     "text-align": "center",
+    "float" : "left",
   });
 
   // cell css
@@ -184,6 +217,13 @@ $(document).ready(function () {
   // button submit click
   $("#button-submit").click(function (e) { 
     submit();
+    e.preventDefault();
+    
+  });
+
+  // button start click
+  $("#button-start").click(function (e) { 
+    timerStart();
     e.preventDefault();
     
   });
