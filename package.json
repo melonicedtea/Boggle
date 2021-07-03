@@ -1,0 +1,27 @@
+{
+  "name": "boggle",
+  "version": "1.0.0",
+  "description": "Boggle",
+  "private": true,
+  "dependencies": {
+    "jquery": "^3.6.0",
+    "webpack": "^5.42.0",
+    "webpack-cli": "^4.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack ./src/boggle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/melonicedtea/Boggle.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/melonicedtea/Boggle/issues"
+  },
+  "homepage": "https://github.com/melonicedtea/Boggle#readme"
+}
