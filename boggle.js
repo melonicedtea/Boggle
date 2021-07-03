@@ -22,7 +22,7 @@ class Cell {
   constructor(letter, id) {
     this.letter = letter;
     this.id = id;   
-    this.unselected = true; 
+    this.selected = false; 
     this.enabled = false;
   }
 }
@@ -82,7 +82,7 @@ function clear() {
   });
 
   $(board).each( function (i, e) { 
-     e.unselected = true;
+     e.selected = false;
      //e.enabled = true;
   });
 }
@@ -135,20 +135,20 @@ function getCellFromIndex(e){
   return cell;
 }
 
-// set unselected to true and change color of cells
+// set selected to true and change color of cells
 function select(e) {
   let letter = getLetterFromIndex(e);
   let cell = getCellFromIndex(e);
 
   if (cell.enabled) {
-    if (cell.unselected) {
+    if (!cell.selected) {
       $(e).css({
         "background-color": "red",
       });
 
       addToString(letter);
 
-      cell.unselected = false;
+      cell.selected = true;
     } else {
       $(e).css({
         "background-color": "transparent",
@@ -156,7 +156,7 @@ function select(e) {
       
       removeFromString(letter);
 
-      cell.unselected = true;
+      cell.selected = false;
     }
   }
 }
