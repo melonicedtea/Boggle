@@ -1,4 +1,4 @@
-global.$ = require("jquery");
+//global.$ = require("jquery");
 
 let dice = [
   ["R", "I", "F", "O", "B", "X"],
@@ -20,20 +20,42 @@ let dice = [
 ];
 
 // Ajax request board sync
-// var myData;
-// $.ajax({
-//   url: "https://localhost:44345/api/boggle/getbogglebox",
-//   type: "GET",
-//   contentType: "application/json",
-//   async: false,
-//   dataType: "json",
-// })
-//   .done(function (data, textStatus, jqXHR) {
-//     myData = data;
-//   })
-//   .fail(function (jqXHR, textStatus, errorThrown) {
-//     console.log("Error: " + textStatus + "\t" + errorThrown.toString());
-//   });
+var myData;
+$.ajax({
+  url: "https://localhost:44345/api/boggle/getbogglebox",
+  type: "GET",
+  contentType: "application/json",
+  async: false,
+  dataType: "json",
+})
+  .done(function (data, textStatus, jqXHR) {
+    myData = data;
+  })
+  .fail(function (jqXHR, textStatus, errorThrown) {
+    console.log("Error: " + textStatus + "\t" + errorThrown.toString());
+  });
+
+function CheckWordValid(boggleBox, word) {
+  var isValidWord = false;
+
+  $.ajax({
+    url:
+      "https://localhost:44345/api/boggle/isvalidword/" +
+      `${boggleBox}/${word}`,
+    type: "GET",
+    contentType: "application/json",
+    async: false,
+    dataType: "json",
+  })
+    .done(function (data, textStatus, jqXHR) {
+      isValidWord = data;
+    })
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      console.log("Error: " + textStatus + "\t" + errorThrown.toString());
+    });
+
+  return isValidWord;
+}
 
 // Cell class
 class Cell {
@@ -48,22 +70,22 @@ class Cell {
 // board array
 let board = [];
 
-// // fill board with cells containing random letters from API
-// let counter = 0;
-// $(myData.dies).each(function (i, die) {
-//   $(myData.dies[i]).each(function (i, die) {
-//     var c = new Cell(die.value, counter);
-//     board[counter] = c;
-//     counter++;
-//   });
-// });
+// fill board with cells containing random letters from API
+let counter = 0;
+$(myData.dies).each(function (i, die) {
+  $(myData.dies[i]).each(function (i, die) {
+    var c = new Cell(die.value, counter);
+    board[counter] = c;
+    counter++;
+  });
+});
 
 // fill board with cells containing random letters
-$(dice).each( function (i, die) {
-  value = die[Math.floor(Math.random() * dice[i].length)];
-  let c = new Cell(value, i);
-  board.push(c);
-});
+// $(dice).each( function (i, die) {
+//   value = die[Math.floor(Math.random() * dice[i].length)];
+//   let c = new Cell(value, i);
+//   board.push(c);
+// });
 
 // field array
 let field = [
@@ -93,11 +115,33 @@ function fillTable() {
     for (let j = 0; j < field.length; j++) {
       $("#board .cell")
         .eq(cnt++)
-        .html(field[i][j].value);
-        //.html(myData.dies[i][j].value);
-        
+        //.html(field[i][j].value);
+        .html(myData.dies[i][j].value);
     }
   }
+}
+
+//check score word
+function GetScoreWord(word) {
+  let _score = 0;
+
+  $.ajax({
+    url:
+      "https://localhost:44345/api/boggle/scoreword/" +
+      `${word}`,
+    type: "GET",
+    contentType: "application/json",
+    async: false,
+    dataType: "json",
+  })
+    .done(function (data, textStatus, jqXHR) {
+      _score = data;
+    })
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      console.log("Error: " + textStatus + "\t" + errorThrown.toString());
+    });
+
+  return _score;
 }
 
 // selected string
@@ -120,11 +164,16 @@ function clear() {
 // wordlist array
 let wordList = [];
 
+let score = 0;
+
 // add string to
 function submit() {
-  if (string.length >= 3 && $.inArray(string, wordList) == -1) {
-    wordList.push(string);
-    $("body").append("<div>" + string + "</div>");
+  if (CheckWordValid(myData.boggleBoxID, string)) {
+    if (string.length >= 3 && $.inArray(string, wordList) == -1) {
+      wordList.push(string);
+      $("body").append("<div>" + string + "</div>");
+    }
+    score += GetScoreWord(string);
   }
   clear();
 }
@@ -234,12 +283,10 @@ function timerStart() {
 }
 
 // score
-let score = 0;
 let score_HTML = "<div id='score'>" + score + " Points </div>";
 
 // updates score
 function updateScore() {
-  score = wordList.length;
   $("#score").text(score + " Points");
 }
 
